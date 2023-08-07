@@ -1,8 +1,10 @@
 package com.financialatm.service.impl;
 
+import com.financialatm.api.dto.AccountDTO;
 import com.financialatm.api.dto.CardDTO;
 import com.financialatm.api.dto.MovementDTO;
 import com.financialatm.service.FinancialService;
+import com.financialatm.utils.AccountGenerator;
 import com.financialatm.utils.MovementGenerator;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,8 @@ import java.util.List;
 public class FinancialServiceImpl implements FinancialService {
     @Override
     public List<MovementDTO> getAllMovementsByIban(String iban) {
+
+        //Aqui haríamos una consulta mediante jpa para obtener los movimientos a partir del IBAN.
         int numberOfMovements = 15;
         List<MovementDTO> randomMovements = MovementGenerator.generateRandomMovements(numberOfMovements);
 
@@ -82,6 +86,41 @@ public class FinancialServiceImpl implements FinancialService {
         card.getAccount().setBalance(card.getAccount().getBalance() + amount);
 
         return "Has ingresado " + amount + " a tu cuenta. El saldo actual es " + card.getAccount().getBalance();
+    }
+
+    @Override
+    public String transferMoney(CardDTO card, Double amount, String destinationAccount) {
+
+        if(card.getAccount().getIban().equals(destinationAccount)) {
+            throw new RuntimeException("No puedes hacer transferencias a tu misma cuenta");
+        }
+
+        if(card.getAccount().getBalance() < amount) {
+            throw new RuntimeException("No dispones de saldo suficiente");
+        }
+        //Aqui hariamos mediante repository(jpa), una consulta para obtener los datos del destinationAccount
+        AccountDTO destinationAccountDTO = AccountGenerator.generateRandomAccount(destinationAccount);
+        String commisionText = "";
+
+        if(card.getAccount().getBankName().equals(destinationAccountDTO.getBankName())) {
+            destinationAccountDTO.setBalance(destinationAccountDTO.getBalance() + amount);
+            card.getAccount().setBalance(card.getAccount().getBalance() - amount);
+        } else {
+            double commisionPercentage = 0.05;
+            double commissionAmount = calculateCommission(amount, commisionPercentage);
+            double amountToDiscount = commissionAmount + amount;
+
+            if(card.getAccount().getBalance() < amountToDiscount) {
+                throw new RuntimeException("No dispones de saldo suficiente para la transferencia debido a que te estamos aplicando uan comisión");
+            }
+            //Aqui hariamos mediante repository(jpa), los updates pertinentes
+            destinationAccountDTO.setBalance(destinationAccountDTO.getBalance() + amount);
+            card.getAccount().setBalance(card.getAccount().getBalance() - amountToDiscount);
+            commisionText = "Se te ha aplicado una comisión del " + commisionPercentage + "%.";
+        }
+
+
+        return "Se ha transferido correctamente el dinero a la cuenta destino. Tu actual balance es: " + card.getAccount().getBalance() + ". " + commisionText;
     }
 
     private double calculateCommission(double amount, double commisionPercentage) {

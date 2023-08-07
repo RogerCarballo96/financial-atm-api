@@ -1,9 +1,13 @@
 package com.financialatm.api.dto;
+import javax.validation.constraints.Pattern;
 
 public class AccountDTO {
+
+    public static final String IBAN_PATTERN = "/^ES[0-9]{2}[0-9]{20}$/gm";
+
+    @Pattern(regexp = IBAN_PATTERN, message = "Invalid IBAN format")
     private String iban;
     private double balance;
-    private String currency;
 
     private String bankName;
 
@@ -23,13 +27,6 @@ public class AccountDTO {
         this.balance = balance;
     }
 
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
 
     public String getBankName() {
         return bankName;

@@ -1,6 +1,7 @@
 package com.financialatm.controller;
 
 import com.financialatm.api.FinancialApi;
+import com.financialatm.api.dto.AccountDTO;
 import com.financialatm.api.dto.CardDTO;
 import com.financialatm.api.dto.MovementDTO;
 import com.financialatm.service.FinancialService;
@@ -39,6 +40,15 @@ public class FinancialControllerApi implements FinancialApi {
     public ResponseEntity<String> depositMoney(CardDTO card, double amount, String bank, String ibanToDeposit) {
         try {
             return ResponseEntity.ok(financialService.deposit(card, amount, bank, ibanToDeposit));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> transferMoney(CardDTO card, String destinationAccount, double amount) {
+        try {
+            return ResponseEntity.ok(financialService.transferMoney(card,amount,destinationAccount));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
