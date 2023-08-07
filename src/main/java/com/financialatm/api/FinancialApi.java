@@ -15,7 +15,7 @@ public interface FinancialApi {
     ResponseEntity<List<MovementDTO>> getAllMovementsByIban(@PathVariable String iban);
 
     @PostMapping("/api/atm/withdrawal")
-    ResponseEntity<String> withdraw(@RequestBody CardDTO card, @RequestParam double amount, @RequestParam String bank);
+    ResponseEntity<String> withdraw(@RequestBody CardDTO card, @RequestParam double amount, @RequestParam String bank, @RequestParam String iban);
 
 
 }

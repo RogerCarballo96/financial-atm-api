@@ -21,10 +21,14 @@ public class FinancialServiceImpl implements FinancialService {
     }
 
     @Override
-    public String withdraw(CardDTO card, Double amount, String cashMachineBank) {
+    public String withdraw(CardDTO card, Double amount, String cashMachineBank, String iban) {
 
         if(!card.isActive()) {
             throw new RuntimeException("Tu tarjeta no está activa actualmente");
+        }
+
+        if(!card.getAccount().getIban().equals(iban)) {
+            throw new RuntimeException("Tu tarjeta no está asociada con el iban al que quieres retirar el dinero");
         }
 
         double moneyToWithdraw = 0;

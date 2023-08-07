@@ -27,9 +27,9 @@ public class FinancialControllerApi implements FinancialApi {
     }
 
     @Override
-    public ResponseEntity<String> withdraw(CardDTO card, double amount, String bank) {
+    public ResponseEntity<String> withdraw(CardDTO card, double amount, String bank , String iban) {
         try {
-            return ResponseEntity.ok(financialService.withdraw(card, amount, bank));
+            return ResponseEntity.ok(financialService.withdraw(card, amount, bank, iban));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
