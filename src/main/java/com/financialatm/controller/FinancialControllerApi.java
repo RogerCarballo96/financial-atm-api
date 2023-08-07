@@ -34,4 +34,15 @@ public class FinancialControllerApi implements FinancialApi {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @Override
+    public ResponseEntity<String> depositMoney(CardDTO card, double amount, String bank, String ibanToDeposit) {
+        try {
+            return ResponseEntity.ok(financialService.deposit(card, amount, bank, ibanToDeposit));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+
 }

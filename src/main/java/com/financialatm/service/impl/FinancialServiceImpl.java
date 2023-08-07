@@ -51,14 +51,37 @@ public class FinancialServiceImpl implements FinancialService {
         }
         String commisionText = "";
         if(!cashMachineBank.equals(card.getAccount().getBankName())) {
-            double commisionPercentage = 0.05;
-            double commission = calculateCommission(amount, commisionPercentage);
+            double commissionPercentage = 0.05;
+            double commission = calculateCommission(amount, commissionPercentage);
             moneyToWithdraw = amount - commission;
-            commisionText = "Se te ha aplicado un " + commisionPercentage + "% de comisión por ser de otro banco.";
+            commisionText = "Se te ha aplicado un " + commissionPercentage + "% de comisión por ser de otro banco.";
         }
 
+        // Aqui llamariamos a un repository para udpatear la tabla de la cuenta bancaria
+        // y creariamos un nuevo registro en la tabla de movimientos mediante JPA.
         card.getAccount().setBalance(card.getAccount().getBalance() - amount);
         return "Has retirado " + moneyToWithdraw + " del banco. Tu saldo actual es: " + card.getAccount().getBalance() + ". " + commisionText;
+    }
+
+    @Override
+    public String deposit(CardDTO card, Double amount, String bank, String iban) {
+
+        if(!card.isActive()) {
+            throw new RuntimeException("Tu tarjeta no está activa actualmente");
+        }
+
+        if(!iban.equals(card.getAccount().getIban())){
+            throw new RuntimeException("IBAN no asociado con tarjeta");
+        }
+
+        if(!bank.equals(card.getAccount().getBankName())) {
+            throw new RuntimeException("No puedes ingresar dinero a otras entidades");
+        }
+        // Aqui llamariamos a un repository para udpatear la tabla de la cuenta bancaria
+        // y creariamos un nuevo registro en la tabla de movimientos mediante JPA.
+        card.getAccount().setBalance(card.getAccount().getBalance() + amount);
+
+        return "Has ingresado " + amount + " a tu cuenta. El saldo actual es " + card.getAccount().getBalance();
     }
 
     private double calculateCommission(double amount, double commisionPercentage) {

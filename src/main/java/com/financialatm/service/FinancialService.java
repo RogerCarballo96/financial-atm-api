@@ -10,4 +10,5 @@ import java.util.List;
 public interface FinancialService {
     List<MovementDTO> getAllMovementsByIban(String iban);
     String withdraw(CardDTO card, Double amount, String bank, String iban);
+    String deposit(CardDTO card, Double amount, String bank, String iban);
 }
